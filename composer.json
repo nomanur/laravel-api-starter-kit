@@ -1,0 +1,71 @@
+{
+    "name": "nomanurrahman/api-starter-kit",
+    "description": "A complete Laravel API boilerplate with authentication, transformers, exception handling, and scaffolding commands",
+    "keywords": [
+        "nomanurrahman",
+        "api",
+        "laravel",
+        "boilerplate",
+        "rest-api",
+        "starter-kit",
+        "fractal",
+        "sanctum"
+    ],
+    "homepage": "https://github.com/nomanurrahman/api-starter-kit",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "nomanur rahman",
+            "email": "nomanurrahman@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.0|^8.1|^8.2",
+        "illuminate/support": "^9.0|^10.0|^11.0",
+        "illuminate/http": "^9.0|^10.0|^11.0",
+        "illuminate/database": "^9.0|^10.0|^11.0",
+        "illuminate/auth": "^9.0|^10.0|^11.0",
+        "league/fractal": "^0.20.1",
+        "laravel/sanctum": "^3.0|^4.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0|^8.0|^9.0",
+        "phpunit/phpunit": "^9.0|^10.0",
+        "pestphp/pest": "^1.0|^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelApi\\StarterKit\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaravelApi\\StarterKit\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelApi\\StarterKit\\ApiStarterKitServiceProvider"
+            ],
+            "aliases": {
+                "ApiBoilerplate": "LaravelApi\\StarterKit\\ApiBoilerplateFacade"
+            }
+        }
+    }
+}
