@@ -163,57 +163,113 @@ All API responses follow a standardized format:
 
 ### Using the Base Controller
 
-Extend the `ApiBaseController` in your controllers to get all the helper methods:
+Extend the `ApiController` in your controllers to get all the helper methods:
 
 ```php
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\User;
 
-use App\Models\Post;
-use LaravelApi\StarterKit\Http\Controllers\ApiBaseController;
+use App\Http\Controllers\ApiController;
+use App\Models\User;
+use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
-class PostsController extends ApiBaseController
+class UserController extends ApiController
 {
-    public function index(): JsonResponse
+    public function __construct()
     {
-        $posts = Post::paginate(15);
-        return $this->paginatedResponse($posts, 'Posts retrieved successfully');
+        parent::__construct();
+
+        $this->middleware('transform.input:'.UserTransformer::class)->only(['store', 'update']);
     }
 
-    public function store(Request $request): JsonResponse
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-        ]);
-
-        $post = Post::create($validated);
-        return $this->success($post, 'Post created successfully', 201);
+        $users = User::all();
+        return $this->showAll($users);
     }
 
-    public function show(Post $post): JsonResponse
+    public function store(Request $request)
     {
-        return $this->success($post, 'Post retrieved successfully');
+        $rules = [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6|confirmed',
+        ];
+
+        $this->validate($request, $rules);
+
+        $data = $request->except('password_confirmation');
+        $data['password'] = bcrypt($request->password);
+        $data['verified'] = User::UNVERIFIED_USER;
+        $data['verification_token'] = User::generateVerificationCode();
+        $data['admin'] = User::REGULAR_USER;
+
+        $user = User::create($data);
+
+        return $this->showOne($user, 201);
     }
 
-    public function update(Request $request, Post $post): JsonResponse
+    public function show(User $user)
     {
-        $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-            'content' => 'sometimes|required|string',
-        ]);
-
-        $post->update($validated);
-        return $this->success($post, 'Post updated successfully');
+        return $this->showOne($user);
     }
 
-    public function destroy(Post $post): JsonResponse
+    public function update(Request $request, User $user)
     {
-        $post->delete();
-        return $this->success(null, 'Post deleted successfully');
+        $rules = [
+            'email' => 'email|unique:users,email,'.$user->id,
+            'password' => 'min:6|confirmed',
+            'admin' => 'in:'.User::ADMIN_USER.','.User::REGULAR_USER,
+        ];
+
+        $this->validate($request, $rules);
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('email') && $user->email != $request->email) {
+            $user->verified = User::UNVERIFIED_USER;
+            $user->verification_token = User::generateVerificationCode();
+            $user->email = $request->email;
+        }
+
+        if ($request->has('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        if ($request->has('admin')) {
+            if (!$user->isVerified()) {
+                return $this->errorResponse('Only verified users can modify the admin field', 409);
+            }
+
+            $user->admin = $request->admin;
+        }
+
+        if (!$user->isDirty()) {
+            return $this->errorResponse('You need to specify a different value to update', 422);
+        }
+
+        $user->save();
+
+        return $this->showOne($user);
+    }
+
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return $this->showOne($user);
+    }
+
+    public function showMessage(string $message, int $code = 200)
+    {
+        return $this->successResponse(['data' => $message], $code);
     }
 }
 ```

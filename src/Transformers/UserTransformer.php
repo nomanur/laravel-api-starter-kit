@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class UserTransformer extends BaseTransformer
 {
     /**
-     * Map original attributes to transformed attributes.
+     * Transform the model into an array.
+     *
+     * @param Model $user
+     * @return array
      */
     public function transform(Model $user)
     {
@@ -31,9 +34,12 @@ class UserTransformer extends BaseTransformer
     }
 
     /**
-     * Map transformed attributes back to original attributes.
+     * Map original attributes to transformed attributes.
+     *
+     * @param string $index
+     * @return string|null
      */
-    public static function originalAttribute($index)
+    public static function originalAttribute(string $index): ?string
     {
         $attribute = [
             'identifier' => 'id',
@@ -51,8 +57,11 @@ class UserTransformer extends BaseTransformer
 
     /**
      * Map transformed attributes back to original attributes.
+     *
+     * @param string $index
+     * @return string|null
      */
-    public static function transformedAttribute($index)
+    public static function transformedAttribute(string $index): ?string
     {
         $attributes = [
             'id' => 'identifier',

@@ -5,6 +5,7 @@ namespace LaravelApi\StarterKit;
 use Illuminate\Support\ServiceProvider;
 use LaravelApi\StarterKit\Console\Commands\InstallApiStarterKit;
 use LaravelApi\StarterKit\Console\Commands\MakeApiResource;
+use LaravelApi\StarterKit\Http\Middleware\TransformInputMiddleware;
 
 class ApiStarterKitServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,9 @@ class ApiStarterKitServiceProvider extends ServiceProvider
         $this->app->singleton('api-boilerplate', function () {
             return new ApiBoilerplate;
         });
+
+        // Register middleware
+        $this->app['router']->aliasMiddleware('transform.input', TransformInputMiddleware::class);
     }
 
     /**

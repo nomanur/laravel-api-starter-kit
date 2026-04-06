@@ -2,247 +2,159 @@
 
 namespace LaravelApi\StarterKit\Examples;
 
+use App\Http\Controllers\ApiController;
+use App\Models\Post;
+use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use LaravelApi\StarterKit\Http\Controllers\ApiBaseController;
+use Illuminate\Http\Response;
 
-/**
- * Example API Controller - Full CRUD Implementation
- * 
- * This file demonstrates a complete API controller implementation
- * using all the features of the API Starter Kit.
- * 
- * NOTE: This is an example file. Use `php artisan make:api-resource`
- * to generate a new controller for your resources.
- */
-class ExamplePostsController extends ApiBaseController
+class ExamplePostsController extends ApiController
 {
-    /**
-     * Display a listing of the resource with pagination and filtering.
-     *
-     * GET /api/v1/posts
-     *
-     * Query Parameters:
-     * - per_page: Number of items per page (default: 15, max: 100)
-     * - page: Page number (default: 1)
-     * - sort_by: Field to sort by
-     * - desc: Sort in descending order (true/false)
-     * - search: Search term
-     *
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function index(Request $request): JsonResponse
+    public function __construct()
     {
-        // Build query with optional filtering
-        $query = \App\Models\Post::query();
+        parent::__construct();
 
-        // Search filter
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('content', 'like', "%{$search}%");
-            });
-        }
+        $this->middleware('transform.input:'.PostTransformer::class)->only(['store', 'update']);
+    }
 
-        // Status filter
-        if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }
+    /**
+     * Display a listing of the resource.
+     *
+     * @return Response
+     */
+    public function index()
+    {
+        $posts = Post::all();
 
-        // Date range filter
-        if ($request->has('from_date')) {
-            $query->whereDate('created_at', '>=', $request->from_date);
-        }
-
-        if ($request->has('to_date')) {
-            $query->whereDate('created_at', '<=', $request->to_date);
-        }
-
-        // Sorting
-        $sortBy = $request->input('sort_by', 'created_at');
-        $sortOrder = $request->input('desc', false) ? 'desc' : 'asc';
-        $query->orderBy($sortBy, $sortOrder);
-
-        // Pagination
-        $perPage = $request->input('per_page', 15);
-        $posts = $query->paginate($perPage);
-
-        return $this->paginatedResponse($posts, 'Posts retrieved successfully');
+        return $this->showAll($posts);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * POST /api/v1/posts
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return Response
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
-        // Validate request
-        $validated = $request->validate([
+        $rules = [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'status' => 'sometimes|in:draft,published,archived',
             'published_at' => 'sometimes|nullable|date',
-            'tags' => 'sometimes|array',
-            'tags.*' => 'string|max:50',
-        ]);
+        ];
 
-        // Create post
-        $post = \App\Models\Post::create([
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'status' => $validated['status'] ?? 'draft',
-            'published_at' => $validated['published_at'] ?? null,
-            'user_id' => $request->user()->id,
-        ]);
+        $this->validate($request, $rules);
 
-        // Sync tags if provided
-        if (isset($validated['tags'])) {
-            // Example: $post->tags()->sync($validated['tags']);
-        }
+        $data = $request->all();
+        $data['user_id'] = $request->user()->id;
 
-        // Load relationships
-        $post->load(['user', 'tags']);
+        $post = Post::create($data);
 
-        return $this->success($post, 'Post created successfully', 201);
+        return $this->showOne($post, 201);
     }
 
     /**
      * Display the specified resource.
      *
-     * GET /api/v1/posts/{post}
-     *
-     * @param \App\Models\Post $post
-     * @return JsonResponse
+     * @param  \App\Models\Post  $post
+     * @return Response
      */
-    public function show(\App\Models\Post $post): JsonResponse
+    public function show(Post $post)
     {
-        // Load relationships
-        $post->load(['user', 'tags', 'comments']);
-
-        return $this->success($post, 'Post retrieved successfully');
+        return $this->showOne($post);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * PUT/PATCH /api/v1/posts/{post}
-     *
-     * @param Request $request
-     * @param \App\Models\Post $post
-     * @return JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Post  $post
+     * @return Response
      */
-    public function update(Request $request, \App\Models\Post $post): JsonResponse
+    public function update(Request $request, Post $post)
     {
-        // Authorize action
-        // $this->authorize('update', $post);
-
-        // Validate request
-        $validated = $request->validate([
+        $rules = [
             'title' => 'sometimes|required|string|max:255',
             'content' => 'sometimes|required|string',
             'status' => 'sometimes|in:draft,published,archived',
             'published_at' => 'sometimes|nullable|date',
-            'tags' => 'sometimes|array',
-            'tags.*' => 'string|max:50',
-        ]);
+        ];
 
-        // Update post
-        $post->update($validated);
+        $this->validate($request, $rules);
 
-        // Update tags if provided
-        if (isset($validated['tags'])) {
-            // Example: $post->tags()->sync($validated['tags']);
+        if ($request->has('title')) {
+            $post->title = $request->title;
         }
 
-        // Load relationships
-        $post->load(['user', 'tags']);
+        if ($request->has('content')) {
+            $post->content = $request->content;
+        }
 
-        return $this->success($post, 'Post updated successfully');
+        if ($request->has('status')) {
+            $post->status = $request->status;
+        }
+
+        if ($request->has('published_at')) {
+            $post->published_at = $request->published_at;
+        }
+
+        if (!$post->isDirty()) {
+            return $this->errorResponse('You need to specify a different value to update', 422);
+        }
+
+        $post->save();
+
+        return $this->showOne($post);
     }
 
     /**
-     * Soft delete the specified resource.
+     * Remove the specified resource from storage.
      *
-     * DELETE /api/v1/posts/{post}
-     *
-     * @param \App\Models\Post $post
-     * @return JsonResponse
+     * @param  \App\Models\Post  $post
+     * @return Response
      */
-    public function destroy(\App\Models\Post $post): JsonResponse
+    public function destroy(Post $post)
     {
-        // Authorize action
-        // $this->authorize('delete', $post);
-
-        // Soft delete
         $post->delete();
 
-        return $this->success(null, 'Post deleted successfully');
+        return $this->showOne($post);
     }
 
     /**
      * Restore a soft deleted resource.
      *
-     * POST /api/v1/posts/{post}/restore
-     *
-     * @param \App\Models\Post $post
-     * @return JsonResponse
+     * @param  \App\Models\Post  $post
+     * @return Response
      */
-    public function restore(\App\Models\Post $post): JsonResponse
+    public function restore(Post $post)
     {
         $post->restore();
 
-        return $this->success($post, 'Post restored successfully');
+        return $this->showMessage('The post has been restored successfully');
     }
 
     /**
-     * Bulk delete resources.
+     * Get published resources.
      *
-     * DELETE /api/v1/posts/bulk
-     *
-     * @param Request $request
-     * @return JsonResponse
+     * @return Response
      */
-    public function bulkDelete(Request $request): JsonResponse
+    public function published()
     {
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:posts,id',
-        ]);
+        $posts = Post::where('status', 'published')->get();
 
-        $deleted = \App\Models\Post::whereIn('id', $validated['ids'])->delete();
-
-        return $this->success([
-            'deleted_count' => $deleted,
-        ], "{$deleted} posts deleted successfully");
+        return $this->showAll($posts);
     }
 
     /**
-     * Get related resources.
+     * Get draft resources.
      *
-     * GET /api/v1/posts/{post}/related
-     *
-     * @param \App\Models\Post $post
-     * @return JsonResponse
+     * @return Response
      */
-    public function related(\App\Models\Post $post): JsonResponse
+    public function drafts()
     {
-        $related = \App\Models\Post::where('id', '!=', $post->id)
-            ->where('status', 'published')
-            ->where(function ($query) use ($post) {
-                $query->where('category_id', $post->category_id)
-                      ->orWhereHas('tags', function ($q) use ($post) {
-                          $q->whereIn('tags.id', $post->tags->pluck('id'));
-                      });
-            })
-            ->limit(5)
-            ->get();
+        $posts = Post::where('status', 'draft')->get();
 
-        return $this->success($related, 'Related posts retrieved successfully');
+        return $this->showAll($posts);
     }
 }

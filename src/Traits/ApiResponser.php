@@ -3,6 +3,7 @@
 namespace LaravelApi\StarterKit\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -48,13 +49,43 @@ trait ApiResponser
     }
 
     /**
+     * Return a simple message response.
+     *
+     * @param string $message
+     * @param int $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function showMessage(string $message, int $code = 200)
+    {
+        return $this->successResponse(['data' => $message], $code);
+    }
+
+    /**
+     * Return a single instance JSON response.
+     *
+     * @param Model $instance
+     * @param int $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function showOne(Model $instance, int $code = 200)
+    {
+        $transformer = $instance->transformer ?? null;
+
+        if ($transformer) {
+            $instance = $this->transformData($instance, $transformer);
+        }
+
+        return $this->successResponse($instance, $code);
+    }
+
+    /**
      * Return a collection JSON response with transformation, filtering, sorting and pagination.
      *
      * @param Collection $collection
      * @param int $code
      * @return \Illuminate\Http\JsonResponse
      */
-    public function showAll(Collection $collection, int $code = 200)
+    protected function showAll(Collection $collection, int $code = 200)
     {
         if ($collection->isEmpty()) {
             return $this->successResponse(['data' => []], $code);
@@ -74,36 +105,6 @@ trait ApiResponser
         }
 
         return $this->successResponse($collection, $code);
-    }
-
-    /**
-     * Return a single instance JSON response.
-     *
-     * @param Model $instance
-     * @param int $code
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function showOne(Model $instance, int $code = 200)
-    {
-        $transformer = $instance->transformer ?? null;
-
-        if ($transformer) {
-            $instance = $this->transformData($instance, $transformer);
-        }
-
-        return $this->successResponse($instance, $code);
-    }
-
-    /**
-     * Return a simple message response.
-     *
-     * @param string $message
-     * @param int $code
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function showMessage(string $message, int $code = 200)
-    {
-        return $this->successResponse(['data' => $message], $code);
     }
 
     /**
