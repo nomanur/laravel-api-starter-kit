@@ -57,7 +57,9 @@ trait ApiResponser
      */
     protected function showMessage(string $message, int $code = 200)
     {
-        return $this->successResponse(['data' => $message], $code);
+        return response()->json([
+            config('api-starter-kit.response.success_key', 'data') => $message,
+        ], $code);
     }
 
     /**
@@ -72,7 +74,9 @@ trait ApiResponser
         $transformer = $instance->getTransformer();
 
         if ($transformer) {
-            $instance = $this->transformData($instance, $transformer);
+            $data = $this->transformData($instance, $transformer);
+
+            return response()->json($data, $code);
         }
 
         return $this->successResponse($instance, $code);
@@ -92,7 +96,9 @@ trait ApiResponser
         $transformer = $firstItem ? ($firstItem instanceof Model ? $firstItem->getTransformer() : null) : null;
 
         if ($transformer) {
-            $paginator = $this->transformData($paginator, $transformer);
+            $data = $this->transformData($paginator, $transformer);
+
+            return response()->json($data, $code);
         }
 
         return $this->successResponse($paginator, $message, $code);
@@ -131,10 +137,12 @@ trait ApiResponser
             $collection = $this->sortData($collection, $transformer);
             $collection = $this->paginateCollection($collection);
             $collection = $this->transformData($collection, $transformer);
-            
+
             if (config('api-starter-kit.cache.enabled', false)) {
                 $collection = $this->cacheResponse($collection);
             }
+
+            return response()->json($collection, $code);
         }
 
         return $this->successResponse($collection, $code);
