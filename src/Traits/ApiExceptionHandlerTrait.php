@@ -85,7 +85,7 @@ trait ApiExceptionHandlerTrait
             $errors = $transformedErrors;
         }
 
-        return $this->errorResponse($errors, 422);
+        return $this->errorResponse('Validation failed', 422, $errors);
     }
 
     /**

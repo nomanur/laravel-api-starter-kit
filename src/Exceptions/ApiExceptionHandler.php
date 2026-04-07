@@ -156,10 +156,10 @@ class ApiExceptionHandler extends ExceptionHandler
                     $flatErrors[] = $includeField ? "{$field}: {$message}" : $message;
                 }
             }
-            return $this->errorResponse($flatErrors, 422);
+            return $this->errorResponse('Validation failed', 422, $flatErrors);
         }
 
-        return $this->errorResponse($errors, 422);
+        return $this->errorResponse('Validation failed', 422, $errors);
     }
 
     /**
