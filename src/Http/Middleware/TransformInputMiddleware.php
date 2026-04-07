@@ -31,6 +31,9 @@ class TransformInputMiddleware
 
         $request->merge($transformedData);
 
+        // Store transformer on request for validation error transformation
+        $request->attributes->set('_transformer', $transformer);
+
         return $next($request);
     }
 }

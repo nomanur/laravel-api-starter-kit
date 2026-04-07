@@ -167,12 +167,18 @@ class ApiExceptionHandler extends ExceptionHandler
      */
     protected function getTransformerFromRequest(): ?string
     {
+        // Check request attributes set by middleware
+        $transformer = request()->attributes->get('_transformer');
+        if ($transformer) {
+            return $transformer;
+        }
+
+        // Fallback: Try to get model from route binding
         $route = request()->route();
         if (!$route) {
             return null;
         }
 
-        // Try to get model from route binding
         foreach ($route->parameters() as $parameter) {
             if (is_object($parameter) && method_exists($parameter, 'getTransformer')) {
                 return $parameter->getTransformer();
