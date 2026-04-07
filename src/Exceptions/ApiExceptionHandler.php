@@ -39,7 +39,7 @@ class ApiExceptionHandler extends ExceptionHandler
     {
         // Only handle as API if it's an API request
         if ($this->isApiRequest($request)) {
-            return $this->handleApiException($exception);
+            return $this->handleApiException($exception, $request);
         }
 
         return parent::render($request, $exception);
@@ -49,16 +49,17 @@ class ApiExceptionHandler extends ExceptionHandler
      * Handle API exceptions and return standardized JSON responses.
      *
      * @param Throwable $exception
+     * @param Request|null $request
      * @return JsonResponse
      */
-    protected function handleApiException(Throwable $exception): JsonResponse
+    protected function handleApiException(Throwable $exception, ?Request $request = null): JsonResponse
     {
         $debug = config('api-starter-kit.exceptions.debug', false);
         $hideMessage = config('api-starter-kit.exceptions.hide_exception_message', true);
         $defaultMessage = config('api-starter-kit.exceptions.default_exception_message', 'An error occurred. Please try again later.');
 
         if ($exception instanceof ValidationException) {
-            return $this->handleValidationException($exception);
+            return $this->handleValidationException($exception, $request);
         }
 
         if ($exception instanceof ModelNotFoundException) {
@@ -127,9 +128,10 @@ class ApiExceptionHandler extends ExceptionHandler
      * Handle validation exception.
      *
      * @param ValidationException $exception
+     * @param Request|null $request
      * @return JsonResponse
      */
-    protected function handleValidationException(ValidationException $exception): JsonResponse
+    protected function handleValidationException(ValidationException $exception, ?Request $request = null): JsonResponse
     {
         $errors = $exception->validator->errors()->getMessages();
 
@@ -137,7 +139,7 @@ class ApiExceptionHandler extends ExceptionHandler
         $includeField = config('api-starter-kit.validation.include_field_in_error', true);
 
         // Transform field names using the transformer if available
-        $transformer = $this->getTransformerFromRequest();
+        $transformer = $this->getTransformerFromRequest($request);
         if ($transformer) {
             $transformedErrors = [];
             foreach ($errors as $field => $messages) {
@@ -163,18 +165,21 @@ class ApiExceptionHandler extends ExceptionHandler
     /**
      * Get the transformer class from the current request context.
      *
+     * @param Request|null $request
      * @return string|null
      */
-    protected function getTransformerFromRequest(): ?string
+    protected function getTransformerFromRequest(?Request $request = null): ?string
     {
+        $request = $request ?? request();
+
         // Check request attributes set by middleware
-        $transformer = request()->attributes->get('_transformer');
+        $transformer = $request->attributes->get('_transformer');
         if ($transformer) {
             return $transformer;
         }
 
         // Fallback: Try to get model from route binding
-        $route = request()->route();
+        $route = $request->route();
         if (!$route) {
             return null;
         }

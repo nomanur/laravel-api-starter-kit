@@ -75,7 +75,7 @@ trait ApiExceptionHandlerTrait
         $errors = $e->validator->errors()->getMessages();
 
         // Transform field names using the transformer if available
-        $transformer = $this->getTransformerFromRequest();
+        $transformer = $this->getTransformerFromRequest($request);
         if ($transformer) {
             $transformedErrors = [];
             foreach ($errors as $field => $messages) {
@@ -91,16 +91,18 @@ trait ApiExceptionHandlerTrait
     /**
      * Get the transformer class from the current request context.
      */
-    protected function getTransformerFromRequest(): ?string
+    protected function getTransformerFromRequest($request = null): ?string
     {
+        $request = $request ?? request();
+
         // Check request attributes set by middleware
-        $transformer = request()->attributes->get('_transformer');
+        $transformer = $request->attributes->get('_transformer');
         if ($transformer) {
             return $transformer;
         }
 
         // Fallback: Try to get model from route binding
-        $route = request()->route();
+        $route = $request->route();
         if (!$route) {
             return null;
         }
