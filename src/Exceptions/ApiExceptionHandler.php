@@ -144,7 +144,11 @@ class ApiExceptionHandler extends ExceptionHandler
             $transformedErrors = [];
             foreach ($errors as $field => $messages) {
                 $transformedField = $transformer::transformedAttribute($field) ?? $field;
-                $transformedErrors[$transformedField] = $messages;
+                // Replace old field name in error messages
+                $transformedMessages = array_map(function ($message) use ($field, $transformedField) {
+                    return str_replace($field, $transformedField, $message);
+                }, $messages);
+                $transformedErrors[$transformedField] = $transformedMessages;
             }
             $errors = $transformedErrors;
         }
