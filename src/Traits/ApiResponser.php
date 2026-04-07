@@ -121,7 +121,7 @@ trait ApiResponser
     protected function showAll(Collection $collection, int $code = 200)
     {
         if ($collection->isEmpty()) {
-            return $this->successResponse(['data' => []], $code);
+            return $this->successResponse([], $code);
         }
 
         $transformer = $collection->first()->getTransformer();
