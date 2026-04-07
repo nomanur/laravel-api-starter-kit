@@ -4,6 +4,7 @@ namespace LaravelApi\StarterKit\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class MakeApiResource extends Command
 {
@@ -34,9 +35,9 @@ class MakeApiResource extends Command
     public function handle()
     {
         $name = $this->argument('name');
-        $model = $this->option('model') ?? ucfirst(str_singular($name));
-        $controller = $this->option('controller') ?? ucfirst(str_plural($name)) . 'Controller';
-        $transformer = $this->option('transformer') ?? ucfirst(str_singular($name)) . 'Transformer';
+        $model = $this->option('model') ?? ucfirst(Str::singular($name));
+        $controller = $this->option('controller') ?? ucfirst(Str::plural($name)) . 'Controller';
+        $transformer = $this->option('transformer') ?? ucfirst(Str::singular($name)) . 'Transformer';
         $force = $this->option('force');
 
         $this->info("Creating API resource: {$name}");
@@ -77,7 +78,7 @@ class MakeApiResource extends Command
         }
 
         $namespace = config('api-starter-kit.models_namespace', 'App\\Models');
-        $table = str_plural(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $model)));
+        $table = Str::plural(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $model)));
 
         $content = <<<PHP
 <?php
@@ -345,7 +346,7 @@ PHP;
         }
 
         $content = File::get($routeFile);
-        $routeName = str_plural($name);
+        $routeName = Str::plural($name);
         $controllerName = str_replace('Controller', '', $controller);
 
         $routeCode = <<<PHP
