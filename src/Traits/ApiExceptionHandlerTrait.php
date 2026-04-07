@@ -74,7 +74,37 @@ trait ApiExceptionHandlerTrait
     {
         $errors = $e->validator->errors()->getMessages();
 
+        // Transform field names using the transformer if available
+        $transformer = $this->getTransformerFromRequest();
+        if ($transformer) {
+            $transformedErrors = [];
+            foreach ($errors as $field => $messages) {
+                $transformedField = $transformer::transformedAttribute($field) ?? $field;
+                $transformedErrors[$transformedField] = $messages;
+            }
+            $errors = $transformedErrors;
+        }
+
         return $this->errorResponse($errors, 422);
+    }
+
+    /**
+     * Get the transformer class from the current request context.
+     */
+    protected function getTransformerFromRequest(): ?string
+    {
+        $route = request()->route();
+        if (!$route) {
+            return null;
+        }
+
+        foreach ($route->parameters() as $parameter) {
+            if (is_object($parameter) && method_exists($parameter, 'getTransformer')) {
+                return $parameter->getTransformer();
+            }
+        }
+
+        return null;
     }
 
     /**

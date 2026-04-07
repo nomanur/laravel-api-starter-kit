@@ -136,6 +136,17 @@ class ApiExceptionHandler extends ExceptionHandler
         $format = config('api-starter-kit.validation.error_format', 'laravel');
         $includeField = config('api-starter-kit.validation.include_field_in_error', true);
 
+        // Transform field names using the transformer if available
+        $transformer = $this->getTransformerFromRequest();
+        if ($transformer) {
+            $transformedErrors = [];
+            foreach ($errors as $field => $messages) {
+                $transformedField = $transformer::transformedAttribute($field) ?? $field;
+                $transformedErrors[$transformedField] = $messages;
+            }
+            $errors = $transformedErrors;
+        }
+
         if ($format === 'flat') {
             $flatErrors = [];
             foreach ($errors as $field => $messages) {
@@ -147,6 +158,28 @@ class ApiExceptionHandler extends ExceptionHandler
         }
 
         return $this->errorResponse($errors, 422);
+    }
+
+    /**
+     * Get the transformer class from the current request context.
+     *
+     * @return string|null
+     */
+    protected function getTransformerFromRequest(): ?string
+    {
+        $route = request()->route();
+        if (!$route) {
+            return null;
+        }
+
+        // Try to get model from route binding
+        foreach ($route->parameters() as $parameter) {
+            if (is_object($parameter) && method_exists($parameter, 'getTransformer')) {
+                return $parameter->getTransformer();
+            }
+        }
+
+        return null;
     }
 
     /**
