@@ -267,7 +267,7 @@ PHP;
 
 namespace App\\Transformers;
 
-use {$model};
+use {$modelNamespace}\\{$model};
 use LaravelApi\\StarterKit\\Transformers\\BaseTransformer;
 
 class {$transformer} extends BaseTransformer
