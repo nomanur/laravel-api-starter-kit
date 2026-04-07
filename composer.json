@@ -27,7 +27,7 @@
         "illuminate/http": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/database": "^10.0|^11.0|^12.0|^13.0",
         "illuminate/auth": "^10.0|^11.0|^12.0|^13.0",
-        "spatie/fractalistic": "^2.0",
+        "spatie/laravel-fractal": "^6.0",
         "laravel/sanctum": "^3.0|^4.0"
     },
     "require-dev": {
