@@ -498,7 +498,7 @@ Check the example files in the package to see a complete implementation.
 The package includes a health check endpoint:
 
 ```bash
-GET /api/v1/health
+GET /health
 ```
 
 Response:
