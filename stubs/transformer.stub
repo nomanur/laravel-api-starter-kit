@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Transformers;
+
+use {{modelNamespace}}\{{model}};
+use LaravelApi\StarterKit\Transformers\BaseTransformer;
+
+class {{transformer}} extends BaseTransformer
+{
+    /**
+     * Transform the model into an array.
+     *
+     * @param {{model}} ${{model}}
+     * @return array
+     */
+    public function transform({{model}} ${{model}}): array
+    {
+        return [
+            'id' => ${{model}}->id,
+            // Add your transformed fields here
+            'created_at' => ${{model}}->created_at?->toIso8601String(),
+            'updated_at' => ${{model}}->updated_at?->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Map original attributes to transformed attributes.
+     *
+     * @param string $index
+     * @return string|null
+     */
+    public static function originalAttribute(string $index): ?string
+    {
+        $attributes = [
+            'id' => 'id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            // Add your attribute mappings here
+        ];
+
+        return $attributes[$index] ?? null;
+    }
+
+    /**
+     * Map transformed attributes back to original attributes.
+     *
+     * @param string $index
+     * @return string|null
+     */
+    public static function transformedAttribute(string $index): ?string
+    {
+        $attributes = [
+            'id' => 'id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at',
+            // Add your attribute mappings here
+        ];
+
+        return $attributes[$index] ?? null;
+    }
+}

@@ -1,0 +1,82 @@
+<?php
+
+namespace {{namespace}};
+
+use {{modelNamespace}}\{{model}};
+use LaravelApi\StarterKit\Http\Controllers\ApiBaseController;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+class {{controller}} extends ApiBaseController
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(): JsonResponse
+    {
+        ${{variable}}s = {{model}}::all();
+
+        return $this->showAll(${{variable}}s);
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            // Add validation rules here
+        ]);
+
+        ${{variable}} = {{model}}::create($validated);
+
+        return $this->showOne(${{variable}}, 201);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param {{model}} ${{variable}}
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show({{model}} ${{variable}}): JsonResponse
+    {
+        return $this->showOne(${{variable}});
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param {{model}} ${{variable}}
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, {{model}} ${{variable}}): JsonResponse
+    {
+        $validated = $request->validate([
+            // Add validation rules here
+        ]);
+
+        ${{variable}}->update($validated);
+
+        return $this->showOne(${{variable}});
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param {{model}} ${{variable}}
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy({{model}} ${{variable}}): JsonResponse
+    {
+        ${{variable}}->delete();
+
+        return $this->showMessage('{{model}} deleted successfully');
+    }
+}

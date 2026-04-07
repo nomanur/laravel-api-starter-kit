@@ -1,0 +1,52 @@
+<?php
+
+namespace {{namespace}};
+
+use LaravelApi\StarterKit\Models\ApiModel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class {{model}} extends ApiModel
+{
+    use HasFactory;
+
+    /**
+     * The transformer class for this model.
+     *
+     * @var string
+     */
+    public static $transformer = \App\Transformers\{{transformer}}::class;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = '{{table}}';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        // Add your fillable fields here
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        // Add hidden fields here
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        // Add casts here
+    ];
+}

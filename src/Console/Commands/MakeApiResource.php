@@ -66,6 +66,34 @@ class MakeApiResource extends Command
     }
 
     /**
+     * Get the path to the stubs directory.
+     */
+    protected function getStubPath(): string
+    {
+        return __DIR__ . '/../../../stubs';
+    }
+
+    /**
+     * Get the contents of a stub file and replace placeholders.
+     */
+    protected function getStubContents(string $stubFile, array $replacements): string
+    {
+        $stubPath = $this->getStubPath() . '/' . $stubFile;
+
+        if (!File::exists($stubPath)) {
+            throw new \RuntimeException("Stub file not found: {$stubPath}");
+        }
+
+        $content = File::get($stubPath);
+
+        foreach ($replacements as $placeholder => $value) {
+            $content = str_replace('{{' . $placeholder . '}}', $value, $content);
+        }
+
+        return $content;
+    }
+
+    /**
      * Create the model file.
      */
     protected function createModel(string $model, string $transformer, bool $force): void
@@ -80,61 +108,12 @@ class MakeApiResource extends Command
         $namespace = config('api-starter-kit.models_namespace', 'App\\Models');
         $table = Str::plural(strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $model)));
 
-        $content = <<<PHP
-<?php
-
-namespace {$namespace};
-
-use LaravelApi\\StarterKit\\Models\\ApiModel;
-use Illuminate\\Database\\Eloquent\\Factories\\HasFactory;
-
-class {$model} extends ApiModel
-{
-    use HasFactory;
-
-    /**
-     * The transformer class for this model.
-     *
-     * @var string
-     */
-    public static \$transformer = \\App\\Transformers\\{$transformer}::class;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected \$table = '{$table}';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected \$fillable = [
-        // Add your fillable fields here
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array
-     */
-    protected \$hidden = [
-        // Add hidden fields here
-    ];
-
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array
-     */
-    protected \$casts = [
-        // Add casts here
-    ];
-}
-
-PHP;
+        $content = $this->getStubContents('model.stub', [
+            'namespace' => $namespace,
+            'model' => $model,
+            'transformer' => $transformer,
+            'table' => $table,
+        ]);
 
         File::ensureDirectoryExists(app_path('Models'));
         File::put($path, $content);
@@ -158,91 +137,13 @@ PHP;
         $modelNamespace = config('api-starter-kit.models_namespace', 'App\\Models');
         $variable = strtolower($model);
 
-        $content = <<<PHP
-<?php
-
-namespace {$namespace};
-
-use {$modelNamespace}\\{$model};
-use LaravelApi\\StarterKit\\Http\\Controllers\\ApiBaseController;
-use Illuminate\\Http\\Request;
-use Illuminate\\Http\\JsonResponse;
-
-class {$controller} extends ApiBaseController
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \\Illuminate\\Http\\JsonResponse
-     */
-    public function index(): JsonResponse
-    {
-        \${$variable}s = {$model}::all();
-
-        return \$this->showAll(\${$variable}s);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param \\Illuminate\\Http\\Request \$request
-     * @return \\Illuminate\\Http\\JsonResponse
-     */
-    public function store(Request \$request): JsonResponse
-    {
-        \$validated = \$request->validate([
-            // Add validation rules here
+        $content = $this->getStubContents('controller.stub', [
+            'namespace' => $namespace,
+            'modelNamespace' => $modelNamespace,
+            'model' => $model,
+            'controller' => $controller,
+            'variable' => $variable,
         ]);
-
-        \${$variable} = {$model}::create(\$validated);
-
-        return \$this->showOne(\${$variable}, 201);
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param {$model} \${$variable}
-     * @return \\Illuminate\\Http\\JsonResponse
-     */
-    public function show({$model} \${$variable}): JsonResponse
-    {
-        return \$this->showOne(\${$variable});
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param \\Illuminate\\Http\\Request \$request
-     * @param {$model} \${$variable}
-     * @return \\Illuminate\\Http\\JsonResponse
-     */
-    public function update(Request \$request, {$model} \${$variable}): JsonResponse
-    {
-        \$validated = \$request->validate([
-            // Add validation rules here
-        ]);
-
-        \${$variable}->update(\$validated);
-
-        return \$this->showOne(\${$variable});
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param {$model} \${$variable}
-     * @return \\Illuminate\\Http\\JsonResponse
-     */
-    public function destroy({$model} \${$variable}): JsonResponse
-    {
-        \${$variable}->delete();
-
-        return \$this->showMessage('{$model} deleted successfully');
-    }
-}
-
-PHP;
 
         File::ensureDirectoryExists(app_path('Http/Controllers/Api'));
         File::put($path, $content);
@@ -264,70 +165,11 @@ PHP;
 
         $modelNamespace = config('api-starter-kit.models_namespace', 'App\\Models');
 
-        $content = <<<PHP
-<?php
-
-namespace App\\Transformers;
-
-use {$modelNamespace}\\{$model};
-use LaravelApi\\StarterKit\\Transformers\\BaseTransformer;
-
-class {$transformer} extends BaseTransformer
-{
-    /**
-     * Transform the model into an array.
-     *
-     * @param {$model} \${$model}
-     * @return array
-     */
-    public function transform({$model} \${$model}): array
-    {
-        return [
-            'id' => \${$model}->id,
-            // Add your transformed fields here
-            'created_at' => \${$model}->created_at?->toIso8601String(),
-            'updated_at' => \${$model}->updated_at?->toIso8601String(),
-        ];
-    }
-
-    /**
-     * Map original attributes to transformed attributes.
-     *
-     * @param string \$index
-     * @return string|null
-     */
-    public static function originalAttribute(string \$index): ?string
-    {
-        \$attributes = [
-            'id' => 'id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-            // Add your attribute mappings here
-        ];
-
-        return \$attributes[\$index] ?? null;
-    }
-
-    /**
-     * Map transformed attributes back to original attributes.
-     *
-     * @param string \$index
-     * @return string|null
-     */
-    public static function transformedAttribute(string \$index): ?string
-    {
-        \$attributes = [
-            'id' => 'id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-            // Add your attribute mappings here
-        ];
-
-        return \$attributes[\$index] ?? null;
-    }
-}
-
-PHP;
+        $content = $this->getStubContents('transformer.stub', [
+            'modelNamespace' => $modelNamespace,
+            'model' => $model,
+            'transformer' => $transformer,
+        ]);
 
         File::ensureDirectoryExists(app_path('Transformers'));
         File::put($path, $content);
