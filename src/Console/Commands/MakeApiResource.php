@@ -177,9 +177,9 @@ class {$controller} extends ApiBaseController
      */
     public function index(): JsonResponse
     {
-        \${$variable}s = {$model}::paginate(request('per_page', 15));
-        
-        return \$this->paginatedResponse(\${$variable}s, '{$model}s retrieved successfully');
+        \${$variable}s = {$model}::all();
+
+        return \$this->showAll(\${$variable}s);
     }
 
     /**
@@ -196,7 +196,7 @@ class {$controller} extends ApiBaseController
 
         \${$variable} = {$model}::create(\$validated);
 
-        return \$this->success(\${$variable}, '{$model} created successfully', 201);
+        return \$this->showOne(\${$variable}, 201);
     }
 
     /**
@@ -207,7 +207,7 @@ class {$controller} extends ApiBaseController
      */
     public function show({$model} \${$variable}): JsonResponse
     {
-        return \$this->success(\${$variable}, '{$model} retrieved successfully');
+        return \$this->showOne(\${$variable});
     }
 
     /**
@@ -225,7 +225,7 @@ class {$controller} extends ApiBaseController
 
         \${$variable}->update(\$validated);
 
-        return \$this->success(\${$variable}, '{$model} updated successfully');
+        return \$this->showOne(\${$variable});
     }
 
     /**
@@ -238,7 +238,7 @@ class {$controller} extends ApiBaseController
     {
         \${$variable}->delete();
 
-        return \$this->success(null, '{$model} deleted successfully');
+        return \$this->showMessage('{$model} deleted successfully');
     }
 }
 

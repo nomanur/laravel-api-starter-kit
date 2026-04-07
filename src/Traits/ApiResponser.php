@@ -79,6 +79,39 @@ trait ApiResponser
     }
 
     /**
+     * Return a paginated paginator JSON response.
+     *
+     * @param LengthAwarePaginator $paginator
+     * @param string $message
+     * @param int $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function paginatedResponse(LengthAwarePaginator $paginator, string $message = 'Success', int $code = 200)
+    {
+        $firstItem = $paginator->getCollection()->first();
+        $transformer = $firstItem ? ($firstItem instanceof Model ? $firstItem->getTransformer() : null) : null;
+
+        if ($transformer) {
+            $paginator = $this->transformData($paginator, $transformer);
+        }
+
+        return $this->successResponse($paginator, $message, $code);
+    }
+
+    /**
+     * Alias for successResponse for convenience.
+     *
+     * @param mixed $data
+     * @param string $message
+     * @param int $code
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function success($data, string $message = 'Success', int $code = 200)
+    {
+        return $this->successResponse($data, $message, $code);
+    }
+
+    /**
      * Return a collection JSON response with transformation, filtering, sorting and pagination.
      *
      * @param Collection $collection
