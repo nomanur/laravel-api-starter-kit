@@ -69,7 +69,7 @@ trait ApiResponser
      */
     protected function showOne(Model $instance, int $code = 200)
     {
-        $transformer = $instance->transformer ?? null;
+        $transformer = $instance->getTransformer();
 
         if ($transformer) {
             $instance = $this->transformData($instance, $transformer);
@@ -91,7 +91,7 @@ trait ApiResponser
             return $this->successResponse(['data' => []], $code);
         }
 
-        $transformer = $collection->first()->transformer ?? null;
+        $transformer = $collection->first()->getTransformer();
 
         if ($transformer) {
             $collection = $this->filterData($collection, $transformer);

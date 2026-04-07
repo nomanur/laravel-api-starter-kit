@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/macbook/Herd/apitester/app/Models/**)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git tag *)",
+      "Bash(git push *)"
+    ]
+  },
+  "$version": 3
+}

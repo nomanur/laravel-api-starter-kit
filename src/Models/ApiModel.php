@@ -14,19 +14,15 @@ abstract class ApiModel extends BaseModel
      *
      * @var string
      */
-    public $transformer;
+    public static $transformer;
 
     /**
-     * Boot the model and set the transformer if defined.
+     * Get the transformer class for this model.
+     *
+     * @return string|null
      */
-    protected static function boot()
+    public function getTransformer(): ?string
     {
-        parent::boot();
-
-        if (property_exists(static::class, 'transformer')) {
-            static::retrieved(function ($model) {
-                $model->transformer = static::$transformer;
-            });
-        }
+        return static::$transformer ?? null;
     }
 }
