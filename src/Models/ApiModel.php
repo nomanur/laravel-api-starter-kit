@@ -6,8 +6,11 @@ use Illuminate\Database\Eloquent\Model as BaseModel;
 
 /**
  * Base API Model with transformer support
+ * 
+ * Extend this class for your API models to enable automatic transformer support.
+ * Do not use this class directly for queries.
  */
-abstract class ApiModel extends BaseModel
+class ApiModel extends BaseModel
 {
     /**
      * The transformer class for this model.
