@@ -346,7 +346,7 @@ PHP;
         }
 
         $content = File::get($routeFile);
-        $routeName = Str::plural($name);
+        $routeName = strtolower(Str::plural($name));
         $controllerName = str_replace('Controller', '', $controller);
 
         $routeCode = <<<PHP
