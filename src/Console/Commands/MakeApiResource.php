@@ -262,6 +262,8 @@ PHP;
             return;
         }
 
+        $modelNamespace = config('api-starter-kit.models_namespace', 'App\\Models');
+
         $content = <<<PHP
 <?php
 
