@@ -11,7 +11,7 @@
         "fractal",
         "sanctum"
     ],
-    "homepage": "https://github.com/nomanur/api-starter-kit",
+    "homepage": "https://github.com/nomanur/laravel-api-starter-kit",
     "license": "MIT",
     "type": "library",
     "authors": [
