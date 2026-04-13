@@ -5,7 +5,7 @@ Get your API up and running in less than 5 minutes!
 ## Step 1: Install the Package
 
 ```bash
-composer require nomanurrahman/api-starter-kit
+composer require nomanur/api-starter-kit
 ```
 
 ## Step 2: Run the Installation Command

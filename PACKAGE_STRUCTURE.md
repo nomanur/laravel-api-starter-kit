@@ -67,7 +67,7 @@ laravel-api-starter-kit/
 ### 1. Install via Composer
 
 ```bash
-composer require nomanurrahman/api-starter-kit
+composer require nomanur/api-starter-kit
 ```
 
 ### 2. Run Installation Command

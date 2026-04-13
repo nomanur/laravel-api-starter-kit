@@ -1,7 +1,7 @@
 # Laravel API Starter Kit
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/nomanurrahman/api-starter-kit.svg?style=flat-square)](https://packagist.org/packages/nomanurrahman/api-starter-kit)
-[![Total Downloads](https://img.shields.io/packagist/dt/nomanurrahman/api-starter-kit.svg?style=flat-square)](https://packagist.org/packages/nomanurrahman/api-starter-kit)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/nomanur/api-starter-kit.svg?style=flat-square)](https://packagist.org/packages/nomanur/api-starter-kit)
+[![Total Downloads](https://img.shields.io/packagist/dt/nomanur/api-starter-kit.svg?style=flat-square)](https://packagist.org/packages/nomanur/api-starter-kit)
 ![PHP Version](https://img.shields.io/badge/php-8.0%2B-blue.svg)
 ![Laravel Version](https://img.shields.io/badge/laravel-9.0%2B-red.svg)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE.md)
@@ -33,7 +33,7 @@ A complete, production-ready Laravel API boilerplate with authentication, transf
 ### Install via Composer
 
 ```bash
-composer require nomanurrahman/api-starter-kit
+composer require nomanur/api-starter-kit
 ```
 
 ### Quick Setup
@@ -563,7 +563,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 
 ## 👥 Credits
 
-- [nomanur rahman](https://github.com/nomanurrahman)
+- [nomanur rahman](https://github.com/nomanur)
 - [All Contributors](../../contributors)
 
 ## 🙏 Support

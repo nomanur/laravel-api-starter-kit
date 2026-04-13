@@ -1,8 +1,8 @@
 {
-    "name": "nomanurrahman/api-starter-kit",
+    "name": "nomanur/api-starter-kit",
     "description": "A complete Laravel API boilerplate with authentication, transformers, exception handling, and scaffolding commands",
     "keywords": [
-        "nomanurrahman",
+        "nomanur",
         "api",
         "laravel",
         "boilerplate",
@@ -11,7 +11,7 @@
         "fractal",
         "sanctum"
     ],
-    "homepage": "https://github.com/nomanurrahman/api-starter-kit",
+    "homepage": "https://github.com/nomanur/api-starter-kit",
     "license": "MIT",
     "type": "library",
     "authors": [
