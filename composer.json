@@ -7,6 +7,9 @@
         "laravel",
         "boilerplate",
         "rest-api",
+        "api-kit",
+        "api-starter",
+        "api-starter-kit",
         "starter-kit",
         "fractal",
         "sanctum"
