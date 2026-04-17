@@ -367,21 +367,22 @@ class Post extends ApiModel
 
 ### API Routes
 
-Define your API routes in `routes/api.php`:
+Define your API routes in `routes/api.php`. You can use the `api_version()` helper to automatically apply the version prefix from your config:
 
 ```php
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\PostsController;
 
-// Public routes
-Route::get('/posts', [PostsController::class, 'index']);
-Route::get('/posts/{post}', [PostsController::class, 'show']);
+// Group routes by version
+Route::prefix(api_version())->group(function () {
+    // Public routes
+    Route::get('/posts', [PostsController::class, 'index']);
+    Route::get('/posts/{post}', [PostsController::class, 'show']);
 
-// Protected routes
-Route::middleware('api.auth')->group(function () {
-    Route::post('/posts', [PostsController::class, 'store']);
-    Route::put('/posts/{post}', [PostsController::class, 'update']);
-    Route::delete('/posts/{post}', [PostsController::class, 'destroy']);
+    // Protected routes
+    Route::middleware('api.auth')->group(function () {
+        Route::apiResource('posts', PostsController::class)->except(['index', 'show']);
+    });
 });
 ```
 
