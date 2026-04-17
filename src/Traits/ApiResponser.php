@@ -157,6 +157,12 @@ trait ApiResponser
             $attribute = $transformer::originalAttribute($query);
 
             if (isset($attribute, $value)) {
+                if ($value === 'true') {
+                    $value = true;
+                } elseif ($value === 'false') {
+                    $value = false;
+                }
+
                 $collection = $collection->where($attribute, $value);
             }
         }
@@ -172,7 +178,7 @@ trait ApiResponser
         if (request()->has('sort_by')) {
             $attribute = $transformer::originalAttribute(request()->sort_by);
 
-            if (request()->has('desc') && request()->desc) {
+            if (request()->has('desc') && request()->boolean('desc')) {
                 $collection = $collection->sortByDesc($attribute);
             } else {
                 $collection = $collection->sortBy($attribute);
