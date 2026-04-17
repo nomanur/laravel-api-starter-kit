@@ -7,7 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class UserTransformer extends BaseTransformer
 {
     /**
-     * Transform the model into an array.
+     * List of resources to automatically include
+     */
+    protected array $defaultIncludes = [
+        //
+    ];
+
+    /**
+     * List of resources possible to include
+     */
+    protected array $availableIncludes = [
+        //
+    ];
+
+    /**
+     * A Fractal transformer.
      *
      * @param Model $user
      * @return array
@@ -49,7 +63,7 @@ class UserTransformer extends BaseTransformer
             'isAdmin' => 'admin',
             'creationDate' => 'created_at',
             'lastChange' => 'updated_at',
-            'deleteDate' => 'deleted_at',
+            'deletedDate' => 'deleted_at',
         ];
 
         return isset($attribute[$index]) ? $attribute[$index] : null;
