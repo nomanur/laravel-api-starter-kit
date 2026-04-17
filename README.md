@@ -301,6 +301,9 @@ class PostTransformer extends BaseTransformer
         ];
     }
 
+    /**
+     * Map transformed attributes to original attributes.
+     */
     public static function originalAttribute(string $index): ?string
     {
         $attributes = [
@@ -316,6 +319,9 @@ class PostTransformer extends BaseTransformer
         return $attributes[$index] ?? null;
     }
 
+    /**
+     * Map original attributes to transformed attributes.
+     */
     public static function transformedAttribute(string $index): ?string
     {
         $attributes = [
@@ -323,7 +329,7 @@ class PostTransformer extends BaseTransformer
             'title' => 'title',
             'content' => 'content',
             'author' => 'author',
-            'published' => 'published_at',
+            'published_at' => 'published',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

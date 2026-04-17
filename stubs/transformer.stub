@@ -24,7 +24,7 @@ class {{transformer}} extends BaseTransformer
     }
 
     /**
-     * Map original attributes to transformed attributes.
+     * Map transformed attributes to original attributes.
      *
      * @param string $index
      * @return string|null
@@ -42,7 +42,7 @@ class {{transformer}} extends BaseTransformer
     }
 
     /**
-     * Map transformed attributes back to original attributes.
+     * Map original attributes to transformed attributes.
      *
      * @param string $index
      * @return string|null

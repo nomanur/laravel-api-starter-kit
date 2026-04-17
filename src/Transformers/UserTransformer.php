@@ -48,7 +48,7 @@ class UserTransformer extends BaseTransformer
     }
 
     /**
-     * Map original attributes to transformed attributes.
+     * Map transformed attributes to original attributes.
      *
      * @param string $index
      * @return string|null
@@ -66,11 +66,11 @@ class UserTransformer extends BaseTransformer
             'deletedDate' => 'deleted_at',
         ];
 
-        return isset($attribute[$index]) ? $attribute[$index] : null;
+        return $attribute[$index] ?? null;
     }
 
     /**
-     * Map transformed attributes back to original attributes.
+     * Map original attributes to transformed attributes.
      *
      * @param string $index
      * @return string|null
@@ -89,6 +89,6 @@ class UserTransformer extends BaseTransformer
             'deleted_at' => 'deletedDate',
         ];
 
-        return isset($attributes[$index]) ? $attributes[$index] : null;
+        return $attributes[$index] ?? null;
     }
 }

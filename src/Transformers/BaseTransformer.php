@@ -7,12 +7,12 @@ use League\Fractal\TransformerAbstract;
 abstract class BaseTransformer extends TransformerAbstract
 {
     /**
-     * Map original attributes to transformed attributes.
+     * Map transformed attributes to original attributes.
      */
     abstract public static function originalAttribute(string $index): ?string;
 
     /**
-     * Map transformed attributes back to original attributes.
+     * Map original attributes to transformed attributes.
      */
     abstract public static function transformedAttribute(string $index): ?string;
 }
