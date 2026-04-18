@@ -1371,6 +1371,9 @@
         ];
     }
 
+    <span class="comment">/**
+     * Map transformed attributes to original attributes.
+     */</span>
     <span class="keyword">public static function</span> <span class="function">originalAttribute</span>(<span class="keyword">string</span> <span class="variable">$index</span>): <span class="keyword">?string</span>
     {
         <span class="variable">$attributes</span> = [
@@ -1379,6 +1382,26 @@
             <span class="string">'content'</span> => <span class="string">'content'</span>,
             <span class="string">'author'</span> => <span class="string">'author'</span>,
             <span class="string">'published'</span> => <span class="string">'published_at'</span>,
+            <span class="string">'created_at'</span> => <span class="string">'created_at'</span>,
+            <span class="string">'updated_at'</span> => <span class="string">'updated_at'</span>,
+        ];
+
+        <span class="keyword">return</span> <span class="variable">$attributes</span>[<span class="variable">$index</span>] ?? <span class="keyword">null</span>;
+    }
+
+    <span class="comment">/**
+     * Map original attributes to transformed attributes.
+     */</span>
+    <span class="keyword">public static function</span> <span class="function">transformedAttribute</span>(<span class="keyword">string</span> <span class="variable">$index</span>): <span class="keyword">?string</span>
+    {
+        <span class="variable">$attributes</span> = [
+            <span class="string">'id'</span> => <span class="string">'id'</span>,
+            <span class="string">'title'</span> => <span class="string">'title'</span>,
+            <span class="string">'content'</span> => <span class="string">'content'</span>,
+            <span class="string">'author'</span> => <span class="string">'author'</span>,
+            <span class="string">'published_at'</span> => <span class="string">'published'</span>,
+            <span class="string">'created_at'</span> => <span class="string">'created_at'</span>,
+            <span class="string">'updated_at'</span> => <span class="string">'updated_at'</span>,
         ];
 
         <span class="keyword">return</span> <span class="variable">$attributes</span>[<span class="variable">$index</span>] ?? <span class="keyword">null</span>;
