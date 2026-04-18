@@ -18,6 +18,7 @@ class MakeApiResource extends Command
                             {--model= : The model name (defaults to singular of resource name)}
                             {--controller= : The controller name (defaults to plural of resource name)}
                             {--transformer= : The transformer name (defaults to resource name + Transformer)}
+                            {--migration : Create a migration file for the model}
                             {--force : Overwrite existing files}';
 
     /**
@@ -38,6 +39,7 @@ class MakeApiResource extends Command
         $model = $this->option('model') ?? ucfirst(Str::singular($name));
         $controller = $this->option('controller') ?? ucfirst(Str::plural($name)) . 'Controller';
         $transformer = $this->option('transformer') ?? ucfirst(Str::singular($name)) . 'Transformer';
+        $createMigration = $this->option('migration');
         $force = $this->option('force');
 
         $this->info("Creating API resource: {$name}");
@@ -52,6 +54,11 @@ class MakeApiResource extends Command
         // Create Transformer
         $this->createTransformer($transformer, $model);
 
+        // Create Migration if requested
+        if ($createMigration) {
+            $this->createMigration($model);
+        }
+
         // Add routes
         $this->addRoutes($name, $controller);
 
@@ -60,6 +67,9 @@ class MakeApiResource extends Command
         $this->info("  - Model: app/Models/{$model}.php");
         $this->info("  - Controller: app/Http/Controllers/Api/{$controller}.php");
         $this->info("  - Transformer: app/Transformers/{$transformer}.php");
+        if ($createMigration) {
+            $this->info("  - Migration: database/migrations/" . date('Y_m_d_His') . "_create_" . Str::plural(strtolower($model)) . "_table.php");
+        }
         $this->info("  - Routes added to routes/api.php");
 
         return Command::SUCCESS;
@@ -175,6 +185,34 @@ class MakeApiResource extends Command
         File::put($path, $content);
 
         $this->info("✓ Transformer created: {$transformer}");
+    }
+
+    /**
+     * Create a migration file.
+     */
+    protected function createMigration(string $model): void
+    {
+        $table = Str::plural(strtolower($model));
+        $timestamp = date('Y_m_d_His');
+        $migrationName = "create_{$table}_table";
+        $migrationFile = "{$timestamp}_{$migrationName}.php";
+
+        $path = database_path("migrations/{$migrationFile}");
+
+        if (File::exists($path)) {
+            $this->warn("Migration {$migrationName} already exists. Skipping...");
+            return;
+        }
+
+        $content = $this->getStubContents('migration.stub', [
+            'table' => $table,
+            'model' => $model,
+        ]);
+
+        File::ensureDirectoryExists(database_path('migrations'));
+        File::put($path, $content);
+
+        $this->info("✓ Migration created: {$migrationFile}");
     }
 
     /**

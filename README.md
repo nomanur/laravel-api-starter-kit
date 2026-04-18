@@ -110,6 +110,14 @@ You can also specify custom names:
 php artisan make:api-resource Post --model=Article --controller=ArticlesController --transformer=ArticleTransformer
 ```
 
+To create a migration along with the API resource:
+
+```bash
+php artisan make:api-resource Post --migration
+```
+
+This will also create a migration file in `database/migrations/` with a basic table structure (id and timestamps).
+
 ### API Response Format
 
 All API responses follow a standardized format:

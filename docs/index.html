@@ -1227,6 +1227,18 @@
     --transformer=ArticleTransformer</code></pre>
                 </div>
 
+                <p>To create a migration along with the API resource:</p>
+                
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code>php artisan make:api-resource Post --migration</code></pre>
+                </div>
+
+                <p>This will also create a migration file in <code>database/migrations/</code> with a basic table structure (id and timestamps).</p>
+
                 <h3 id="response-format">API Response Format</h3>
                 <p>All API responses follow a standardized format:</p>
 
