@@ -3,6 +3,7 @@
 namespace LaravelApi\StarterKit;
 
 use Illuminate\Support\ServiceProvider;
+use LaravelApi\StarterKit\Console\Commands\ExportPostmanCollection;
 use LaravelApi\StarterKit\Console\Commands\InstallApiStarterKit;
 use LaravelApi\StarterKit\Console\Commands\MakeApiResource;
 use LaravelApi\StarterKit\Http\Middleware\TransformInputMiddleware;
@@ -46,6 +47,7 @@ class ApiStarterKitServiceProvider extends ServiceProvider
             $this->commands([
                 InstallApiStarterKit::class,
                 MakeApiResource::class,
+                ExportPostmanCollection::class,
             ]);
         }
 

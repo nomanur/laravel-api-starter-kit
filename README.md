@@ -21,6 +21,7 @@ A complete, production-ready Laravel API boilerplate with authentication, transf
 - ✅ **CORS Support** - Cross-origin request handling
 - ✅ **Validation** - Standardized validation error responses
 - ✅ **Base Controllers & Models** - Extendable foundation classes
+- ✅ **Postman Export** - Export API routes as a Postman Collection with one command
 
 ## 📦 Installation
 
@@ -427,6 +428,7 @@ Configuration options in `config/api-starter-kit.php`:
 - **cache**: Caching settings
 - **exceptions**: Exception handling settings
 - **validation**: Validation error format
+- **postman**: Postman collection export settings
 
 ## 🔒 Authentication
 
@@ -493,6 +495,120 @@ All exceptions are automatically caught and returned as JSON:
 - **NotFoundHttpException** (404): Route not found
 - **MethodNotAllowedHttpException** (405): Invalid HTTP method
 - **QueryException** (409/500): Database errors
+
+## 📮 Postman Collection Export
+
+Export all your registered API routes as a **Postman Collection v2.1** JSON file with a single command. The exported collection can be imported directly into Postman for API testing and documentation.
+
+### Basic Usage
+
+```bash
+php artisan api:export
+```
+
+This will scan all registered API routes, organize them into folders, and generate a `postman_collection.json` file in `storage/app/`.
+
+> **Alias:** You can also use `php artisan api:export-postman`
+
+### Command Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--output=` | Custom output file path | `storage/app/postman_collection.json` |
+| `--name=` | Collection name | App name from config |
+| `--bearer=` | Default Bearer token for authenticated routes | `{{auth_token}}` (Postman variable) |
+| `--base-url=` | Base URL override | `{{base_url}}` (Postman variable) |
+| `--group-by=` | Grouping strategy: `prefix` or `middleware` | `prefix` |
+| `--include=` | Regex pattern to include only matching routes | All routes |
+| `--exclude=` | Regex pattern to exclude matching routes | None |
+| `--force` | Overwrite existing file without confirmation | Prompts |
+
+### Examples
+
+```bash
+# Export with a custom collection name and output path
+php artisan api:export --name="My API v2" --output=docs/api.json
+
+# Pre-fill Bearer token for authenticated routes
+php artisan api:export --bearer="your-token-here"
+
+# Group routes by middleware (Authenticated vs Public)
+php artisan api:export --group-by=middleware
+
+# Only export user and post routes
+php artisan api:export --include="users|posts"
+
+# Exclude health check and debug routes
+php artisan api:export --exclude="health|debug"
+
+# Force overwrite without confirmation
+php artisan api:export --force
+```
+
+### What Gets Exported
+
+The command automatically:
+
+- **Organizes routes into folders** by URL prefix (e.g., all `/api/users/*` routes in a "Users" folder)
+- **Generates readable names** from route names or URI patterns (e.g., `GET /api/users/{id}` → "Get User")
+- **Converts path parameters** from Laravel `{param}` syntax to Postman `:param` format
+- **Detects authentication** middleware (`auth:sanctum`, `auth:api`, `auth`, `api.auth`) and adds Bearer token auth
+- **Adds JSON body templates** for `POST`, `PUT`, and `PATCH` requests
+- **Sets default headers** (`Accept: application/json`, `Content-Type: application/json`)
+- **Uses Postman variables** for `{{base_url}}` and `{{auth_token}}` for easy environment switching
+
+### Configuration
+
+Customize the export behavior in `config/api-starter-kit.php`:
+
+```php
+'postman' => [
+    'collection_name' => env('API_POSTMAN_COLLECTION_NAME', null),
+    'base_url' => env('API_POSTMAN_BASE_URL', '{{base_url}}'),
+    'auth_middleware' => ['auth:sanctum', 'auth:api', 'auth', 'api.auth'],
+    'headers' => [
+        'Accept' => 'application/json',
+        'Content-Type' => 'application/json',
+    ],
+    'structured' => true,
+    'output_path' => 'postman_collection.json',
+],
+```
+
+| Config Key | Description | Default |
+|------------|-------------|---------|
+| `collection_name` | Name of the Postman collection | App name |
+| `base_url` | Base URL for all requests (supports Postman variables) | `{{base_url}}` |
+| `auth_middleware` | Middleware names that indicate authenticated routes | `['auth:sanctum', 'auth:api', 'auth', 'api.auth']` |
+| `headers` | Default headers added to every request | `Accept` + `Content-Type` as JSON |
+| `structured` | Whether to organize routes into folders | `true` |
+| `output_path` | Default output path relative to `storage/app/` | `postman_collection.json` |
+
+### Output Summary
+
+After export, the command displays a formatted table:
+
+```
+📦 Exporting Postman Collection...
+
+✅ Postman Collection exported successfully!
+
++--------+---------------------+------------------+-------------------+
+| Method | URI                 | Name             | Middleware        |
++--------+---------------------+------------------+-------------------+
+| GET    | api/health          | —                | —                 |
+| GET    | api/users           | users.index      | auth:sanctum      |
+| POST   | api/users           | users.store      | auth:sanctum      |
+| GET    | api/users/{user}    | users.show       | auth:sanctum      |
+| PUT    | api/users/{user}    | users.update     | auth:sanctum      |
+| DELETE | api/users/{user}    | users.destroy    | auth:sanctum      |
++--------+---------------------+------------------+-------------------+
+
+📄 Collection: My API Collection
+📁 File: /path/to/storage/app/postman_collection.json
+🔢 Routes exported: 6
+📦 File size: 4.52 KB
+```
 
 ## 🧪 Testing
 

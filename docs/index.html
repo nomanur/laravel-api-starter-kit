@@ -1010,6 +1010,7 @@
                     <a href="#query-parameters" class="sidebar-link">Query Parameters</a>
                     <a href="#exception-handling" class="sidebar-link">Exception Handling</a>
                     <a href="#helper-functions" class="sidebar-link">Helper Functions</a>
+                    <a href="#postman-export" class="sidebar-link">Postman Export</a>
                 </div>
                 <div class="sidebar-section">
                     <div class="sidebar-title">Configuration</div>
@@ -1092,6 +1093,11 @@
                         <div class="feature-icon">📦</div>
                         <h4>ApiModel</h4>
                         <p>Base model with automatic transformer support.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📮</div>
+                        <h4>Postman Export</h4>
+                        <p>Export API routes as a Postman Collection v2.1 with one command.</p>
                     </div>
                 </div>
             </section>
@@ -1684,6 +1690,238 @@
 
 <span class="comment">// Paginated response</span>
 <span class="function">api_paginated</span>(<span class="variable">$paginator</span>, <span class="string">'Success message'</span>, <span class="number">200</span>);</code></pre>
+                </div>
+            </section>
+
+            <!-- Postman Collection Export Section -->
+            <section id="postman-export" class="section">
+                <h2>📮 Postman Collection Export</h2>
+                <p>Export all your registered API routes as a <strong>Postman Collection v2.1</strong> JSON file with a single command. The exported collection can be imported directly into Postman for API testing and documentation.</p>
+
+                <h3>Basic Usage</h3>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code>php artisan api:export</code></pre>
+                </div>
+
+                <div class="callout callout-info">
+                    <span class="callout-icon">ℹ️</span>
+                    <div class="callout-content">
+                        <p><strong>Alias:</strong> You can also use <code>php artisan api:export-postman</code></p>
+                    </div>
+                </div>
+
+                <h3>Command Options</h3>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Option</th>
+                                <th>Description</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>--output=</code></td>
+                                <td>Custom output file path</td>
+                                <td><code>storage/app/postman_collection.json</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--name=</code></td>
+                                <td>Collection name</td>
+                                <td>App name from config</td>
+                            </tr>
+                            <tr>
+                                <td><code>--bearer=</code></td>
+                                <td>Default Bearer token for authenticated routes</td>
+                                <td><code>{{auth_token}}</code> (Postman variable)</td>
+                            </tr>
+                            <tr>
+                                <td><code>--base-url=</code></td>
+                                <td>Base URL override</td>
+                                <td><code>{{base_url}}</code> (Postman variable)</td>
+                            </tr>
+                            <tr>
+                                <td><code>--group-by=</code></td>
+                                <td>Grouping strategy: <code>prefix</code> or <code>middleware</code></td>
+                                <td><code>prefix</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>--include=</code></td>
+                                <td>Regex pattern to include only matching routes</td>
+                                <td>All routes</td>
+                            </tr>
+                            <tr>
+                                <td><code>--exclude=</code></td>
+                                <td>Regex pattern to exclude matching routes</td>
+                                <td>None</td>
+                            </tr>
+                            <tr>
+                                <td><code>--force</code></td>
+                                <td>Overwrite existing file without confirmation</td>
+                                <td>Prompts user</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Examples</h3>
+                <p>Export with a custom collection name and output path:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code>php artisan api:export --name="My API v2" --output=docs/api.json</code></pre>
+                </div>
+
+                <p>Pre-fill Bearer token for authenticated routes:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code>php artisan api:export --bearer="your-token-here"</code></pre>
+                </div>
+
+                <p>Group routes by middleware instead of URL prefix:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code>php artisan api:export --group-by=middleware</code></pre>
+                </div>
+
+                <p>Filter routes with include/exclude patterns:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>bash</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code><span class="comment"># Only export user and post routes</span>
+php artisan api:export --include="users|posts"
+
+<span class="comment"># Exclude health check and debug routes</span>
+php artisan api:export --exclude="health|debug"
+
+<span class="comment"># Combine both</span>
+php artisan api:export --include="api/v1" --exclude="health"</code></pre>
+                </div>
+
+                <h3>What Gets Exported</h3>
+                <p>The command automatically handles the following for each route:</p>
+                <ul>
+                    <li><strong>Folder Organization:</strong> Routes are grouped into folders by URL prefix (e.g., all <code>/api/users/*</code> routes in a "Users" folder)</li>
+                    <li><strong>Readable Names:</strong> Human-readable item names generated from route names or URI patterns (e.g., <code>GET /api/users/{id}</code> → "Get User")</li>
+                    <li><strong>Path Variables:</strong> Laravel <code>{param}</code> syntax is converted to Postman <code>:param</code> format with descriptions</li>
+                    <li><strong>Auth Detection:</strong> Routes with auth middleware (<code>auth:sanctum</code>, <code>auth:api</code>, <code>auth</code>, <code>api.auth</code>) automatically get Bearer token auth</li>
+                    <li><strong>Request Bodies:</strong> <code>POST</code>, <code>PUT</code>, and <code>PATCH</code> requests include a JSON body template</li>
+                    <li><strong>Default Headers:</strong> <code>Accept: application/json</code> and <code>Content-Type: application/json</code> on every request</li>
+                    <li><strong>Postman Variables:</strong> <code>{{base_url}}</code> and <code>{{auth_token}}</code> variables for easy environment switching</li>
+                </ul>
+
+                <h3>Configuration</h3>
+                <p>Customize the export behavior in <code>config/api-starter-kit.php</code>:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>php</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code><span class="string">'postman'</span> => [
+    <span class="string">'collection_name'</span> => <span class="function">env</span>(<span class="string">'API_POSTMAN_COLLECTION_NAME'</span>, <span class="keyword">null</span>),
+    <span class="string">'base_url'</span> => <span class="function">env</span>(<span class="string">'API_POSTMAN_BASE_URL'</span>, <span class="string">'{{base_url}}'</span>),
+    <span class="string">'auth_middleware'</span> => [<span class="string">'auth:sanctum'</span>, <span class="string">'auth:api'</span>, <span class="string">'auth'</span>, <span class="string">'api.auth'</span>],
+    <span class="string">'headers'</span> => [
+        <span class="string">'Accept'</span> => <span class="string">'application/json'</span>,
+        <span class="string">'Content-Type'</span> => <span class="string">'application/json'</span>,
+    ],
+    <span class="string">'structured'</span> => <span class="keyword">true</span>,
+    <span class="string">'output_path'</span> => <span class="string">'postman_collection.json'</span>,
+],</code></pre>
+                </div>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Config Key</th>
+                                <th>Description</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>collection_name</code></td>
+                                <td>Name of the Postman collection</td>
+                                <td>App name</td>
+                            </tr>
+                            <tr>
+                                <td><code>base_url</code></td>
+                                <td>Base URL for all requests (supports Postman variables)</td>
+                                <td><code>{{base_url}}</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>auth_middleware</code></td>
+                                <td>Middleware names that indicate authenticated routes</td>
+                                <td><code>['auth:sanctum', 'auth:api', 'auth', 'api.auth']</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>headers</code></td>
+                                <td>Default headers added to every request</td>
+                                <td><code>Accept</code> + <code>Content-Type</code> as JSON</td>
+                            </tr>
+                            <tr>
+                                <td><code>structured</code></td>
+                                <td>Whether to organize routes into folders</td>
+                                <td><code>true</code></td>
+                            </tr>
+                            <tr>
+                                <td><code>output_path</code></td>
+                                <td>Default output path relative to <code>storage/app/</code></td>
+                                <td><code>postman_collection.json</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Output Summary</h3>
+                <p>After export, the command displays a formatted summary table of all exported routes:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>terminal</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code>📦 Exporting Postman Collection...
+
+✅ Postman Collection exported successfully!
+
++--------+---------------------+------------------+-------------------+
+| Method | URI                 | Name             | Middleware        |
++--------+---------------------+------------------+-------------------+
+| GET    | api/health          | —                | —                 |
+| GET    | api/users           | users.index      | auth:sanctum      |
+| POST   | api/users           | users.store      | auth:sanctum      |
+| GET    | api/users/{user}    | users.show       | auth:sanctum      |
+| PUT    | api/users/{user}    | users.update     | auth:sanctum      |
+| DELETE | api/users/{user}    | users.destroy    | auth:sanctum      |
++--------+---------------------+------------------+-------------------+
+
+📄 Collection: My API Collection
+📁 File: /path/to/storage/app/postman_collection.json
+🔢 Routes exported: 6
+📦 File size: 4.52 KB</code></pre>
+                </div>
+
+                <div class="callout callout-success">
+                    <span class="callout-icon">💡</span>
+                    <div class="callout-content">
+                        <p><strong>Tip:</strong> Set up Postman environment variables for <code>base_url</code> and <code>auth_token</code> to easily switch between development, staging, and production environments.</p>
+                    </div>
                 </div>
             </section>
 

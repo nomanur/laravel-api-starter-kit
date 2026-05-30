@@ -155,4 +155,27 @@ return [
         'allow_credentials' => env('API_CORS_ALLOW_CREDENTIALS', 'false'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Postman Collection Export
+    |--------------------------------------------------------------------------
+    |
+    | These settings control the behavior of the `php artisan api:export`
+    | command, which generates a Postman Collection v2.1 JSON file from
+    | your registered API routes.
+    |
+    */
+
+    'postman' => [
+        'collection_name' => env('API_POSTMAN_COLLECTION_NAME', null), // Falls back to app name
+        'base_url' => env('API_POSTMAN_BASE_URL', '{{base_url}}'), // Postman variable by default
+        'auth_middleware' => ['auth:sanctum', 'auth:api', 'auth', 'api.auth'],
+        'headers' => [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ],
+        'structured' => true, // Group routes into folders
+        'output_path' => 'postman_collection.json', // Relative to storage/app
+    ],
+
 ];
