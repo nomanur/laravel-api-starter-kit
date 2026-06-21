@@ -8,6 +8,8 @@
 
 A complete, production-ready Laravel API boilerplate with authentication, transformers, exception handling, rate limiting, and scaffolding commands. Build APIs faster with a standardized structure and best practices built-in.
 
+For the full documentation, visit [https://nomanur.github.io/laravel-api-starter-kit/](https://nomanur.github.io/laravel-api-starter-kit/).
+
 ## 🚀 Features
 
 - ✅ **Standardized API Responses** - Consistent JSON response format
