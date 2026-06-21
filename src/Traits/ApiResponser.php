@@ -163,7 +163,22 @@ trait ApiResponser
                     $value = false;
                 }
 
-                $collection = $collection->where($attribute, $value);
+                if (is_array($value)) {
+                    $collection = $collection->filter(function ($item) use ($attribute, $value) {
+                        if (method_exists($item, 'isTranslatableAttribute') && $item->isTranslatableAttribute($attribute) && method_exists($item, 'getTranslation')) {
+                            foreach ($value as $locale => $val) {
+                                if ($item->getTranslation($attribute, $locale) !== $val) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+
+                        return $item->{$attribute} === $value;
+                    });
+                } else {
+                    $collection = $collection->where($attribute, $value);
+                }
             }
         }
 
@@ -212,7 +227,7 @@ trait ApiResponser
             'path' => LengthAwarePaginator::resolveCurrentPath(),
         ]);
 
-        $paginated->appends(request()->all());
+        $paginated->appends(request()->query());
 
         return $paginated;
     }
