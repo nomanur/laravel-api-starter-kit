@@ -81,12 +81,21 @@ php artisan vendor:publish --tag=api-starter-kit-config
 ```
 
 4. Register middleware in `bootstrap/app.php`:
+
+First import the namespaces at the top of your `bootstrap/app.php` file:
+```php
+use LaravelApi\StarterKit\Http\Middleware\ApiAuthenticate;
+use LaravelApi\StarterKit\Http\Middleware\ApiCors;
+use LaravelApi\StarterKit\Http\Middleware\ApiRateLimit;
+```
+
+Then register them inside the `withMiddleware` configuration block:
 ```php
 ->withMiddleware(function (Middleware $middleware) {
     $middleware->alias([
-        'api.auth' => \LaravelApi\StarterKit\Http\Middleware\ApiAuthenticate::class,
-        'api.rate_limit' => \LaravelApi\StarterKit\Http\Middleware\ApiRateLimit::class,
-        'api.cors' => \LaravelApi\StarterKit\Http\Middleware\ApiCors::class,
+        'api.auth' => ApiAuthenticate::class,
+        'api.rate_limit' => ApiRateLimit::class,
+        'api.cors' => ApiCors::class,
     ]);
 })
 ```
@@ -463,7 +472,26 @@ The package includes three middleware classes:
 - **ApiRateLimit**: Rate limiting for API endpoints
 - **ApiCors**: CORS headers for cross-origin requests
 
-Apply them to routes:
+### Registration
+
+To use these middleware in your application, you must import their namespaces and register them in `bootstrap/app.php`:
+
+```php
+use LaravelApi\StarterKit\Http\Middleware\ApiAuthenticate;
+use LaravelApi\StarterKit\Http\Middleware\ApiCors;
+use LaravelApi\StarterKit\Http\Middleware\ApiRateLimit;
+
+// Inside the configure block:
+$middleware->alias([
+    'api.auth' => ApiAuthenticate::class,
+    'api.rate_limit' => ApiRateLimit::class,
+    'api.cors' => ApiCors::class,
+]);
+```
+
+### Applying Middleware
+
+Apply them to routes in `routes/api.php`:
 
 ```php
 Route::middleware(['api.auth', 'api.rate_limit'])->group(function () {
