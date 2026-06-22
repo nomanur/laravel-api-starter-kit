@@ -1180,16 +1180,27 @@
                     </li>
                     <li>
                         <strong>Register middleware in <code>bootstrap/app.php</code></strong>
+                        <p>Import the middleware namespaces at the top of your <code>bootstrap/app.php</code>:</p>
                         <div class="code-block">
                             <div class="code-block-header">
                                 <span>php</span>
                                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                             </div>
-                            <pre class="with-header"><code>-><span class="function">withMiddleware</span>(<span class="keyword">function</span> (<span class="variable">$middleware</span>) {
+                            <pre class="with-header"><code><span class="keyword">use</span> <span class="class-name">LaravelApi\StarterKit\Http\Middleware\ApiAuthenticate</span>;
+<span class="keyword">use</span> <span class="class-name">LaravelApi\StarterKit\Http\Middleware\ApiCors</span>;
+<span class="keyword">use</span> <span class="class-name">LaravelApi\StarterKit\Http\Middleware\ApiRateLimit</span>;</code></pre>
+                        </div>
+                        <p>Then register them inside the <code>withMiddleware</code> configuration:</p>
+                        <div class="code-block">
+                            <div class="code-block-header">
+                                <span>php</span>
+                                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre class="with-header"><code>-><span class="function">withMiddleware</span>(<span class="keyword">function</span> (<span class="class-name">Middleware</span> <span class="variable">$middleware</span>) {
     <span class="variable">$middleware</span>-><span class="function">alias</span>([
-        <span class="string">'api.auth'</span> => <span class="class-name">\LaravelApi\StarterKit\Http\Middleware\ApiAuthenticate</span>::<span class="keyword">class</span>,
-        <span class="string">'api.rate_limit'</span> => <span class="class-name">\LaravelApi\StarterKit\Http\Middleware\ApiRateLimit</span>::<span class="keyword">class</span>,
-        <span class="string">'api.cors'</span> => <span class="class-name">\LaravelApi\StarterKit\Http\Middleware\ApiCors</span>::<span class="keyword">class</span>,
+        <span class="string">'api.auth'</span> => <span class="class-name">ApiAuthenticate</span>::<span class="keyword">class</span>,
+        <span class="string">'api.rate_limit'</span> => <span class="class-name">ApiRateLimit</span>::<span class="keyword">class</span>,
+        <span class="string">'api.cors'</span> => <span class="class-name">ApiCors</span>::<span class="keyword">class</span>,
     ]);
 })</code></pre>
                         </div>
@@ -1551,10 +1562,31 @@
                     </table>
                 </div>
 
-                <p>Apply them to routes:</p>
+                <h3>Middleware Registration</h3>
+                <p>To use these middleware in your application, you must import their namespaces and register them in <code>bootstrap/app.php</code>:</p>
+                
                 <div class="code-block">
                     <div class="code-block-header">
-                        <span>php</span>
+                        <span>bootstrap/app.php</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre class="with-header"><code><span class="keyword">use</span> <span class="class-name">LaravelApi\StarterKit\Http\Middleware\ApiAuthenticate</span>;
+<span class="keyword">use</span> <span class="class-name">LaravelApi\StarterKit\Http\Middleware\ApiCors</span>;
+<span class="keyword">use</span> <span class="class-name">LaravelApi\StarterKit\Http\Middleware\ApiRateLimit</span>;
+
+<span class="comment">// Inside the configure block:</span>
+<span class="variable">$middleware</span>-><span class="function">alias</span>([
+    <span class="string">'api.auth'</span> => <span class="class-name">ApiAuthenticate</span>::<span class="keyword">class</span>,
+    <span class="string">'api.rate_limit'</span> => <span class="class-name">ApiRateLimit</span>::<span class="keyword">class</span>,
+    <span class="string">'api.cors'</span> => <span class="class-name">ApiCors</span>::<span class="keyword">class</span>,
+]);</code></pre>
+                </div>
+
+                <h3>Applying Middleware</h3>
+                <p>Once registered, you can apply them to your routes using their aliases:</p>
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span>routes/api.php</span>
                         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
                     </div>
                     <pre class="with-header"><code><span class="class-name">Route</span>::<span class="function">middleware</span>([<span class="string">'api.auth'</span>, <span class="string">'api.rate_limit'</span>])-><span class="function">group</span>(<span class="keyword">function</span> () {
