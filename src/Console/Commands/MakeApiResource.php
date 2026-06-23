@@ -49,7 +49,7 @@ class MakeApiResource extends Command
         $this->createModel($model, $transformer, $force);
 
         // Create Controller
-        $this->createController($controller, $model);
+        $this->createController($controller, $model, $transformer);
 
         // Create Transformer
         $this->createTransformer($transformer, $model);
@@ -134,7 +134,7 @@ class MakeApiResource extends Command
     /**
      * Create the controller file.
      */
-    protected function createController(string $controller, string $model): void
+    protected function createController(string $controller, string $model, string $transformer): void
     {
         $path = app_path("Http/Controllers/Api/{$controller}.php");
 
@@ -153,6 +153,7 @@ class MakeApiResource extends Command
             'model' => $model,
             'controller' => $controller,
             'variable' => $variable,
+            'transformer' => $transformer,
         ]);
 
         File::ensureDirectoryExists(app_path('Http/Controllers/Api'));
